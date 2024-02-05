@@ -3,13 +3,21 @@ pipeline {
     agent any
     parameters{
         choice(name: 'VERSION', choices:['1.1.0','1.2.0','1.3.0'], description: '')
-        booleanParam(name: 'executeTest', defaultValue: true, description: '')
+        booleanParam(name: 'executeTest', defaultValue: treu, description: '')
     }
     stages {
+        stage("init"){
+            steps{
+                script{
+                    gv = load "script.groovy"
+                }
+            }
+        }
         stage('Build') {
             steps {
-                echo 'Building..'
-                sh "mvn --version"
+                script{
+                    gv.buildApp()
+                }
             }
         }
         stage('Test') {
@@ -19,13 +27,16 @@ pipeline {
                 }
             }
             steps {
-                echo 'Testing..'
+                script{
+                    gv.testdApp()
+                }
             }
         }
         stage('Deploy') {
             steps {
-                echo 'Deploying....'
-                echo "deploying version ${params.VERSION}"
+                script{
+                    gv.deployApp()
+                }
             }
         }
     }
